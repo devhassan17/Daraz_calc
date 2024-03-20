@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="img.png">
+  <title>Daraz Profit Calculator</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    .header {
+        text-align: center;
+        padding: 20px 0;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        background-color: #FF5722;
+        color: #fff;
+        font-size: 24px;
+        font-weight: bold;
+      }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .input-section {
+      width: 50%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .result-section {
+      width: 45%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .calculator {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .input-container {
+      margin-bottom: 15px;
+    }
+
+    input, select {
+      width: calc(100% - 22px); 
+      padding: 10px;
+      border: 1px solid #FF5722;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #FF5722;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .results {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 700px;
+      width: 90%;
+    }
+
+    table {
+      width: 100%;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+
+    @media screen and (max-width: 960px) {
+      .input-section, .result-section {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div class="header">
+        👏 Daraz Calculator
+      </div>
+  <div class="container">
+    <div class="input-section">
+      <div class="calculator">
+        <table>
+          <tr>
+            <th colspan="2">Enter Product Details</th>
+          </tr>
+          <tr>
+            <td><label for="currency">Select Currency:</label></td>
+            <td>
+              <select id="currency">
+                <option value="PKR" selected>Pakistani Rupee (PKR)</option>
+                <option value="USD">US Dollar (USD)</option>
+                <option value="BDT">Bangladeshi Taka (BDT)</option>
+                <option value="LKR">Sri Lankan Rupee (LKR)</option>
+                <option value="NPR">Nepalese Rupee (NPR)</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="total-cost">Total Product Cost:</label></td>
+            <td><input type="number" id="total-cost" placeholder="Total Product Cost" required></td>
+          </tr>
+          <tr>
+            <td><label for="packaging-cost">Packaging Cost:</label></td>
+            <td><input type="number" id="packaging-cost" placeholder="Packaging Cost" required></td>
+          </tr>
+          <tr>
+            <td><label for="delivery-charges">Delivery Charges:</label></td>
+            <td><input type="number" id="delivery-charges" placeholder="Delivery Charges" required></td>
+          </tr>
+          <tr>
+            <td><label for="commission">Commission(<a style="text-decoration: none;" href="https://university.daraz.pk/course/learn?id=1083&type=policies&login=skip" target="_blank">Check rates</a>):</label></td>
+            <td><input type="number" id="commission" placeholder="Commission(%)" required></td>
+          </tr>
+          <tr>
+            <td><label for="vat">VAT(%):</label></td>
+            <td><input type="number" id="vat" placeholder="VAT(%)" required></td>
+          </tr>
+          <tr>
+            <td><label for="selling-price">Product Selling Price:</label></td>
+            <td><input type="number" id="selling-price" placeholder="Product Selling Price" required></td>
+          </tr>
+          <tr>
+            <td><label for="average-sale">Average Sale (units per day):</label></td>
+            <td><input type="number" id="average-sale" placeholder="Average Sale (units per day)" required></td>
+          </tr>
+          <tr>
+            <td><label for="payment-fee">Payment Handling Fee(%):</label></td>
+            <td><input type="number" id="payment-fee" placeholder="Payment Handling Fee(%)" required></td>
+          </tr>
+        </table>
+        <br>
+        <button onclick="calculate()">Calculate</button>
+      </div>
+    </div>
+    <div class="result-section">
+      <div class="results" id="results">
+        <table>
+            <tr>
+              <th colspan="2">Profit Details</th>
+            </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+  <script>
+  
+    window.onload = function() {
+      document.getElementById('currency').value = localStorage.getItem('currency') || 'PKR';
+      document.getElementById('total-cost').value = localStorage.getItem('total-cost') || '';
+      document.getElementById('packaging-cost').value = localStorage.getItem('packaging-cost') || '';
+      document.getElementById('delivery-charges').value = localStorage.getItem('delivery-charges') || '';
+      document.getElementById('commission').value = localStorage.getItem('commission') || '';
+      document.getElementById('vat').value = localStorage.getItem('vat') || '';
+      document.getElementById('selling-price').value = localStorage.getItem('selling-price') || '';
+      document.getElementById('average-sale').value = localStorage.getItem('average-sale') || '';
+      document.getElementById('payment-fee').value = localStorage.getItem('payment-fee') || '';
+    }
+
+    function calculate() {
+      
+      const currency = document.getElementById('currency').value;
+      const totalCost = parseFloat(document.getElementById('total-cost').value);
+      const packagingCost = parseFloat(document.getElementById('packaging-cost').value);
+      const deliveryCharges = parseFloat(document.getElementById('delivery-charges').value);
+      const commissionPercentage = parseFloat(document.getElementById('commission').value);
+      const vatPercentage = parseFloat(document.getElementById('vat').value);
+      const sellingPrice = parseFloat(document.getElementById('selling-price').value);
+      const averageSale = parseFloat(document.getElementById('average-sale').value);
+      const paymentFeePercentage = parseFloat(document.getElementById('payment-fee').value);
+
+    
+      localStorage.setItem('currency', currency);
+      localStorage.setItem('total-cost', totalCost);
+      localStorage.setItem('packaging-cost', packagingCost);
+      localStorage.setItem('delivery-charges', deliveryCharges);
+      localStorage.setItem('commission', commissionPercentage);
+      localStorage.setItem('vat', vatPercentage);
+      localStorage.setItem('selling-price', sellingPrice);
+      localStorage.setItem('average-sale', averageSale);
+      localStorage.setItem('payment-fee', paymentFeePercentage);
+
+      const calccommission = (commissionPercentage / 100) * sellingPrice;
+      const calcpayment = (paymentFeePercentage / 100) * sellingPrice;
+      const vatamount = (calccommission + deliveryCharges + calcpayment);
+      const netvat = (vatPercentage / 100) * vatamount;
+      const totalcost = totalCost + packagingCost + deliveryCharges + netvat + calcpayment + calccommission;
+      const Profit = sellingPrice - totalcost;
+
+      const resultsDiv = document.getElementById('results');
+      var resultHTML = `
+
+        <table>
+            <tr>
+            <th colspan="2">Profit Details</th>
+          </tr>
+            <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            </tr>
+            <tr>
+            <td>Profit Margin:</td>
+            <td>${(Profit / sellingPrice * 100).toFixed(2)}%</td>
+            </tr>
+            <tr>
+            <td>ROI:</td>
+            <td>${((Profit / totalcost) * 100).toFixed(2)}%</td>
+            </tr>
+            <tr>
+            <td>VAT Amount:</td>
+            <td>${netvat.toFixed(2)} ${currency}</td>
+            </tr>
+            <tr>
+            <td>Profit Amount:</td>
+            <td>${Profit.toFixed(2)} ${currency}</td>
+            </tr>
+            <tr>
+            <td>Total Cost:</td>
+            <td>${totalcost.toFixed(2)} ${currency}</td>
+            </tr>
+            <tr>
+            <td>Payment Fee Amount:</td>
+            <td>${calcpayment.toFixed(2)} ${currency}</td>
+            </tr>
+            <tr>
+            <td>Commission Amount:</td>
+            <td>${calccommission.toFixed(2)} ${currency}</td>
+            </tr>
+        </table>
+        <br>
+        <button class="generate_pdf_btn" onclick="generate_pdf_fun()"> Generate PDF </button>
+    `;
+      resultsDiv.innerHTML = resultHTML;
+     
+    }
+    function generate_pdf_fun() {
+     
+      const inputLabels = document.querySelectorAll('.calculator label');
+      const inputValues = document.querySelectorAll('.calculator input, .calculator select');
+
+      let labelValuePairs = '';
+      for (let i = 0; i < inputLabels.length; i++) {
+        labelValuePairs += `<tr><td>${inputLabels[i].textContent}</td><td>${inputValues[i].value}</td></tr>`;
+      }
+
+      const resultSection = document.querySelector('.results');
+      const resultHTML = resultSection.innerHTML;
+
+      
+      var opt = {
+        margin: 1,
+        filename: 'daraz_profit_details.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 4 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      const pdfContent = `
+      <div style="text-align: center;  background-color: #FF5722; padding: 3px;">
+        <h1 style="color: white;">Product Report</h1>
+      </div>
+        <br>
+        <table>
+          <tr>
+            <th colspan="2">Enter Product Details</th>
+          </tr>
+          ${labelValuePairs}
+        </table>
+        <br><br>
+        ${resultHTML.replace('<button class="generate_pdf_btn" onclick="generate_pdf_fun()"> Generate PDF </button>', '')}
+        <hr>
+        `;
+
+      html2pdf().from(pdfContent).set(opt).save();
+    }
+    
+  </script>
+</body>
+</html>
