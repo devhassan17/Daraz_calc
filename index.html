@@ -130,7 +130,7 @@
             </td>
           </tr>
           <tr>
-            <td><label for="total-cost">Total Product Cost:</label></td>
+            <td><label for="total-cost">Product Cost:</label></td>
             <td><input type="number" id="total-cost" placeholder="Total Product Cost" required></td>
           </tr>
           <tr>
@@ -138,17 +138,21 @@
             <td><input type="number" id="packaging-cost" placeholder="Packaging Cost" required></td>
           </tr>
           <tr>
-            <td><label for="delivery-charges">Delivery Charges:</label></td>
-            <td><input type="number" id="delivery-charges" placeholder="Delivery Charges" required></td>
-          </tr>
-          <tr>
-            <td><label for="commission">Commission(<a style="text-decoration: none;" href="https://university.daraz.pk/course/learn?id=1083&type=policies&login=skip" target="_blank">Check rates</a>):</label></td>
+            <td><label for="commission"> Daraz Commission(<a style="text-decoration: none;" href="/tools/daraz/commission-structure/rates.html" target="_blank">Check rates</a>):</label></td>
             <td><input type="number" id="commission" placeholder="Commission(%)" required></td>
           </tr>
           <tr>
-            <td><label for="vat">VAT(%):</label></td>
+            <td><label for="vat">VAT(%)(<a style="text-decoration: none;" href="/tools/daraz/commission-structure/rates.html#vatrates" target="_blank">Check rates</a>):</label></td>
             <td><input type="number" id="vat" placeholder="VAT(%)" required></td>
           </tr>
+          <tr>
+            <td><label for="payment-fee">Payment Handling Fee(<a style="text-decoration: none;" href="/tools/daraz/commission-structure/rates.html#handlingfee" target="_blank">Check rates</a>):</label></td>
+            <td><input type="number" id="payment-fee" placeholder="Payment Handling Fee(%)" required></td>
+          </tr>
+          <tr>
+            <td><label for="delivery-charges">Delivery Charges:</label></td>
+            <td><input type="number" id="delivery-charges" placeholder="Delivery Charges" required></td>
+          </tr>  
           <tr>
             <td><label for="selling-price">Product Selling Price:</label></td>
             <td><input type="number" id="selling-price" placeholder="Product Selling Price" required></td>
@@ -157,10 +161,7 @@
             <td><label for="average-sale">Average Sale (units per day):</label></td>
             <td><input type="number" id="average-sale" placeholder="Average Sale (units per day)" required></td>
           </tr>
-          <tr>
-            <td><label for="payment-fee">Payment Handling Fee(%):</label></td>
-            <td><input type="number" id="payment-fee" placeholder="Payment Handling Fee(%)" required></td>
-          </tr>
+          
         </table>
         <br>
         <button onclick="calculate()">Calculate</button>
@@ -202,7 +203,7 @@
       const vatPercentage = parseFloat(document.getElementById('vat').value);
       const sellingPrice = parseFloat(document.getElementById('selling-price').value);
       const averageSale = parseFloat(document.getElementById('average-sale').value);
-      const paymentFeePercentage = parseFloat(document.getElementById('payment-fee').value);
+      const paymentFee = parseFloat(document.getElementById('payment-fee').value);
 
     
       localStorage.setItem('currency', currency);
@@ -213,13 +214,12 @@
       localStorage.setItem('vat', vatPercentage);
       localStorage.setItem('selling-price', sellingPrice);
       localStorage.setItem('average-sale', averageSale);
-      localStorage.setItem('payment-fee', paymentFeePercentage);
+      localStorage.setItem('payment-fee', paymentFee);
 
       const calccommission = (commissionPercentage / 100) * sellingPrice;
-      const calcpayment = (paymentFeePercentage / 100) * sellingPrice;
-      const vatamount = (calccommission + deliveryCharges + calcpayment);
+      const vatamount = (calccommission + deliveryCharges + paymentFee);
       const netvat = (vatPercentage / 100) * vatamount;
-      const totalcost = totalCost + packagingCost + deliveryCharges + netvat + calcpayment + calccommission;
+      const totalcost = totalCost + packagingCost + deliveryCharges + netvat + paymentFee + calccommission;
       const Profit = sellingPrice - totalcost;
 
       const resultsDiv = document.getElementById('results');
@@ -227,40 +227,38 @@
 
         <table>
             <tr>
-            <th colspan="2">Profit Details</th>
+              <th colspan="2">Profit Details</th>
           </tr>
             <tr>
-            <th>Parameter</th>
-            <th>Value</th>
+              <th>Parameter</th>
+              <th>Value</th>
             </tr>
             <tr>
-            <td>Profit Margin:</td>
-            <td>${(Profit / sellingPrice * 100).toFixed(2)}%</td>
+              <td>Daraz Commission Amount:</td>
+              <td>${calccommission.toFixed(2)} ${currency}</td>
             </tr>
             <tr>
-            <td>ROI:</td>
-            <td>${((Profit / totalcost) * 100).toFixed(2)}%</td>
+              <td>Payment Fee Amount:</td>
+              <td>${paymentFee.toFixed(2)} ${currency}</td>
             </tr>
             <tr>
-            <td>VAT Amount:</td>
-            <td>${netvat.toFixed(2)} ${currency}</td>
+              <td>VAT Amount:</td>
+              <td>${netvat.toFixed(2)} ${currency}</td>
             </tr>
             <tr>
-            <td>Profit Amount:</td>
-            <td>${Profit.toFixed(2)} ${currency}</td>
+              <td>Total Cost:</td>
+              <td>${totalcost.toFixed(2)} ${currency}</td>
             </tr>
             <tr>
-            <td>Total Cost:</td>
-            <td>${totalcost.toFixed(2)} ${currency}</td>
+              <td><b>Profit Margin:</b></td>
+              <td><b>${(Profit / sellingPrice * 100).toFixed(2)}%</b></td>
             </tr>
             <tr>
-            <td>Payment Fee Amount:</td>
-            <td>${calcpayment.toFixed(2)} ${currency}</td>
+              <td><b>Profit Amount:</b></td>
+              <td><b>${Profit.toFixed(2)} ${currency}</b></td>
             </tr>
-            <tr>
-            <td>Commission Amount:</td>
-            <td>${calccommission.toFixed(2)} ${currency}</td>
-            </tr>
+
+
         </table>
         <br>
         <button class="generate_pdf_btn" onclick="generate_pdf_fun()"> Generate PDF </button>
